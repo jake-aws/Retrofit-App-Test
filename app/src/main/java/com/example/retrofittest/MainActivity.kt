@@ -7,11 +7,10 @@ import android.widget.Toast
 import com.example.retrofittest.databinding.ActivityMainBinding
 import com.example.retrofittest.dummyJSON.Product
 import com.example.retrofittest.dummyJSON.ProductService
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
+import com.squareup.picasso.Picasso
 import retrofit2.*
 import retrofit2.converter.moshi.MoshiConverterFactory
-import kotlin.math.log
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -25,8 +24,11 @@ class MainActivity : AppCompatActivity() {
         retrofit = Retrofit.Builder().baseUrl("https://dummyjson.com/")
             .addConverterFactory(MoshiConverterFactory.create()).build()
         productService = retrofit.create(ProductService::class.java)
+        getItem((1..100).random())
+        binding.nextBtn.setOnClickListener {
+            getItem((1..100).random())
+        }
 
-        getItem(23)
     }
 
     private fun getItem(id: Int) {
@@ -39,8 +41,10 @@ class MainActivity : AppCompatActivity() {
                     return
                 }
                 val body = response.body()!!
-                val brand = body.brand
-                binding.tvTextBrand.text = brand
+                Picasso.get().load(body.thumbnail).into(binding.imageView)
+                binding.tvTextBrand.text = body.brand
+                binding.tvTextDesc.text = body.description
+                binding.tvTextCategory.text = body.category
             }
 
             override fun onFailure(call: Call<Product>, t: Throwable) {
